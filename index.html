@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>סידור קבלני שאיבה</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap">
+<style>
+:root{
+  --bg:#EEEDEA; --surface:#FFFFFF; --fg:#22211F; --muted:#6B6862; --line:#D9D6D0;
+  --accent:#E07A12; --accent-ink:#FFFFFF; --accent-soft:#FBE9D6;
+  --ok:#1F7A4D; --ok-soft:#DDF1E6; --bad:#B3261E; --bad-soft:#F9DEDC; --wa:#128C4A;
+  --display:"Secular One","Assistant",system-ui,sans-serif;
+  --body:"Assistant",system-ui,"Segoe UI",Arial,sans-serif;
+  --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#171716; --surface:#22211F; --fg:#EFEDE9; --muted:#A39F98; --line:#3A3835;
+  --accent:#F29436; --accent-ink:#1A1206; --accent-soft:#3D2A15;
+  --ok:#5BC48D; --ok-soft:#173527; --bad:#F2867E; --bad-soft:#3E1C1A; --wa:#1E9E58; color-scheme:dark}}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header .wrap{padding-block:10px 0;display:flex;flex-direction:column;gap:8px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-family:var(--display);font-size:22px;margin:0;font-weight:400}
+.tabs{display:flex;gap:4px}
+.tab{flex:1;border:0;background:none;font:inherit;font-weight:600;color:var(--muted);padding:10px 4px;border-bottom:3px solid transparent;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--fg);border-color:var(--accent)}
+h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;text-wrap:balance}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+button.card{font:inherit;color:inherit;text-align:right;cursor:pointer;width:100%}
+.when{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px}
+.site{font-size:17px;font-weight:600}
+.meta{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;padding:2px 9px;border-radius:999px;background:var(--bg);border:1px solid var(--line);white-space:nowrap}
+.chip.hit{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+.pill{font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.pill.open{background:var(--accent-soft)}
+.pill.taken{background:var(--ok-soft);color:var(--ok)}
+.btn{font:inherit;font-weight:700;border-radius:10px;padding:11px 16px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+.btn.ghost{background:none}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.small{min-height:38px;padding:7px 12px;font-size:14px}
+.btn[disabled]{opacity:.6}
+.btn:focus-visible,.tab:focus-visible,button.card:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1 1 auto}
+.back{background:none;border:0;font:inherit;color:var(--muted);padding:6px 0;cursor:pointer;text-align:right}
+.empty{border:1.5px dashed var(--line);border-radius:var(--r);padding:22px;text-align:center;color:var(--muted)}
+.detail dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.detail dt{color:var(--muted);font-size:14px}
+.detail dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.label{font-size:12px;color:var(--muted);letter-spacing:.04em;font-weight:700}
+.note{font-size:14px;color:var(--muted)}
+.banner{border-radius:var(--r);padding:12px 14px;font-weight:600}
+.banner.ok{background:var(--ok-soft);color:var(--ok)}
+.banner.bad{background:var(--bad-soft);color:var(--bad)}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label,.field .lbl{font-weight:700;font-size:14px}
+input,select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);width:100%;min-height:44px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;font:inherit;font-weight:700;padding:10px;border:0;background:var(--bg);color:var(--muted);cursor:pointer;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.checks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.checks label{display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid var(--line);border-radius:10px;padding:8px 2px;font-size:14px;font-weight:600;cursor:pointer}
+.checks input{width:auto;min-height:0}
+.checks label:has(input:checked){background:var(--accent-soft);border-color:var(--accent)}
+.err{color:var(--bad);font-size:14px;font-weight:600}
+.big{font-size:20px;min-height:60px}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:30;font-weight:600;max-width:90%}
+</style>
+</head>
+<body>
+<header id="hdr" hidden><div class="wrap">
+  <div class="brand"><h1>סידור קבלני שאיבה</h1><button class="btn ghost small" id="logout">יציאה</button></div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-jobs" aria-selected="true">עבודות</button>
+    <button class="tab" role="tab" id="tab-cons" aria-selected="false">קבלנים</button>
+  </div>
+</div></header>
+<main class="wrap" id="app"><div class="empty">טוען…</div></main>
+<div id="sheet-root"></div>
+
+<script>
+/* ===== הגדרות החיבור ל-Supabase ===== */
+const SUPABASE_URL = 'https://krejoaamtuyvbyxblrqa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_CsohqOVXj8N8oIfwKEtBPA_ROs2zjlN';
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
+<script>
+const MOBILE_SIZES=[36,42,48,52,56,62,66,70];
+const sizeLabel=n=>n<=42?`עד ${n}`:`${n}`;
+const pumpText=j=>j.pump_type==='mayko'?`מייקו · ${j.pump_size} מ' צנרת`:`ניידת ${sizeLabel(j.pump_size)}`;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const p2=n=>String(n).padStart(2,'0');
+function fmtWhen(iso){
+  const d=new Date(iso); if(isNaN(d)) return '';
+  const time=`${p2(d.getHours())}:${p2(d.getMinutes())}`;
+  const now=new Date(), tmr=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  if(d.toDateString()===now.toDateString()) return `היום · ${time}`;
+  if(d.toDateString()===tmr.toDateString()) return `מחר · ${time}`;
+  const day=new Intl.DateTimeFormat('he-IL',{weekday:'short'}).format(d);
+  return `${day} ${p2(d.getDate())}.${p2(d.getMonth()+1)} · ${time}`;
+}
+const toLocalInput=iso=>{const d=new Date(iso);return isNaN(d)?'':`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}T${p2(d.getHours())}:${p2(d.getMinutes())}`;};
+const app=document.getElementById('app');
+let toastT;
+function toast(msg){clearTimeout(toastT);let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);}t.textContent=msg;toastT=setTimeout(()=>t.remove(),2800);}
+
+if(!window.supabase){ app.innerHTML='<div class="banner bad">לא הצלחתי לטעון את האתר. בדוק חיבור לאינטרנט ורענן.</div>'; throw new Error('supabase-js missing'); }
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const params=new URLSearchParams(location.search);
+
+/* =========================================================
+   מסך הקבלן: נפתח מהקישור ב-WhatsApp (?job=...&t=...)
+   ========================================================= */
+if(params.get('job')&&params.get('t')){ contractorPage(params.get('job'),params.get('t')); }
+else { adminApp(); }
+
+async function contractorPage(jobId,token){
+  document.title='הצעת עבודה';
+  let offer=null, msg='', busy=false;
+  const draw=()=>{
+    if(!offer){app.innerHTML=`<div class="stack"><h2>הצעת עבודה</h2><div class="banner bad">${esc(msg||'הקישור לא תקין או שהעבודה בוטלה.')}</div></div>`;return;}
+    let status='';
+    if(offer.status==='mine') status=`<div class="banner ok">העבודה נרשמה על שם ${esc(offer.contractor)}. נתראה באתר.</div>`;
+    else if(offer.status==='taken') status=`<div class="banner bad">העבודה כבר נלקחה על ידי קבלן אחר.</div>`;
+    app.innerHTML=`<div class="stack detail">
+      <div class="note">הצעת עבודה ל: ${esc(offer.contractor)}</div>
+      <div class="card"><h2>${esc(offer.site)}</h2>
+        <dl><dt>מועד</dt><dd>${esc(fmtWhen(offer.starts_at))}</dd><dt>משאבה מוזמנת</dt><dd>${esc(pumpText(offer))}</dd><dt>כמות</dt><dd>${esc(offer.qty)} קוב</dd></dl></div>
+      ${status||`<button class="btn primary big" id="take" ${busy?'disabled':''}>${busy?'רגע…':'אני לוקח'}</button>`}
+      ${msg&&offer?`<div class="err">${esc(msg)}</div>`:''}
+    </div>`;
+    const b=document.getElementById('take');
+    if(b) b.onclick=async()=>{
+      busy=true;msg='';draw();
+      const {data,error}=await sb.rpc('claim_job',{p_job:jobId,p_token:token});
+      busy=false;
+      if(error){msg='לא הצלחתי לשמור. בדוק חיבור ונסה שוב.';}
+      else if(data==='ok'||data==='mine'){offer.status='mine';}
+      else if(data==='taken'){offer.status='taken';}
+      else {offer=null;}
+      draw();
+    };
+  };
+  const {data,error}=await sb.rpc('get_offer',{p_job:jobId,p_token:token});
+  if(error) msg='לא הצלחתי לטעון. בדוק חיבור ורענן.';
+  offer=data||null; draw();
+}
+
+/* =========================================================
+   מסך המנהל
+   ========================================================= */
+function adminApp(){
+  let state={tab:'jobs',view:'list',jobId:null,jobs:[],contractors:[],loaded:false};
+  const hdr=document.getElementById('hdr');
+  const sheetRoot=document.getElementById('sheet-root');
+  const closeSheet=()=>{sheetRoot.innerHTML='';};
+  const baseUrl=location.origin+location.pathname;
+
+  async function load(){
+    const [j,c]=await Promise.all([
+      sb.from('jobs').select('*').order('starts_at'),
+      sb.from('contractors').select('*').order('name')
+    ]);
+    if(j.error||c.error){toast('שגיאה בטעינה: '+(j.error||c.error).message);return;}
+    state.jobs=j.data; state.contractors=c.data; state.loaded=true; render();
+  }
+  const conName=id=>(state.contractors.find(c=>c.id===id)||{}).name||'קבלן שנמחק';
+
+  function matches(job){
+    return state.contractors.map(c=>{
+      if(job.pump_type==='mayko'){ return c.mayko&&c.mayko>=job.pump_size?{c,exact:c.mayko===job.pump_size}:null; }
+      const ok=(c.mobiles||[]).filter(s=>s>=job.pump_size).sort((a,b)=>a-b);
+      return ok.length?{c,exact:ok[0]===job.pump_size,hit:ok[0]}:null;
+    }).filter(Boolean).sort((a,b)=>(b.exact-a.exact)||a.c.name.localeCompare(b.c.name,'he'));
+  }
+  const offerLink=(job,c)=>`${baseUrl}?job=${job.id}&t=${c.token}`;
+  function waLink(job,c){
+    let p=String(c.phone||'').replace(/\D/g,''); if(p.startsWith('0')) p='972'+p.slice(1);
+    const text=`שלום ${c.name},\nיש עבודת שאיבה פנויה:\nאתר: ${job.site}\nמועד: ${fmtWhen(job.starts_at)}\nמשאבה מוזמנת: ${pumpText(job)}\nכמות: ${job.qty} קוב\n\nלקבלת העבודה לחץ על הקישור:\n${offerLink(job,c)}\n\nהראשון שמאשר מקבל את העבודה.`;
+    return `https://wa.me/${p}?text=${encodeURIComponent(text)}`;
+  }
+  const statusPill=j=>j.taken_by?`<span class="pill taken">נלקחה · ${esc(conName(j.taken_by))}</span>`:`<span class="pill open">פתוחה</span>`;
+
+  function render(){
+    document.getElementById('tab-jobs').setAttribute('aria-selected',state.tab==='jobs');
+    document.getElementById('tab-cons').setAttribute('aria-selected',state.tab==='cons');
+    if(state.tab==='cons') return renderCons();
+    if(state.view==='job') return renderJob();
+    renderJobs();
+  }
+  function renderJobs(){
+    app.innerHTML=`<div class="stack">
+      <div class="row"><h2>עבודות</h2><button class="btn primary small" data-act="new-job">+ עבודה חדשה</button></div>
+      ${!state.loaded?'<div class="empty">טוען…</div>':state.jobs.length?state.jobs.map(j=>`
+        <button class="card" data-act="open-job" data-id="${j.id}">
+          <div class="row"><span class="when">${esc(fmtWhen(j.starts_at))}</span>${statusPill(j)}</div>
+          <div class="site">${esc(j.site)}</div>
+          <div class="meta">${esc(pumpText(j))} · ${esc(j.qty)} קוב</div>
+        </button>`).join(''):'<div class="empty">אין עדיין עבודות. לחץ "+ עבודה חדשה" כדי להוסיף.</div>'}
+    </div>`;
+  }
+  function renderJob(){
+    const j=state.jobs.find(x=>x.id===state.jobId); if(!j){state.view='list';return renderJobs();}
+    const m=matches(j);
+    app.innerHTML=`<div class="stack detail">
+      <button class="back" data-act="back">→ חזרה לעבודות</button>
+      <div class="card">
+        <div class="row"><h2>${esc(j.site)}</h2>${statusPill(j)}</div>
+        <dl><dt>מועד</dt><dd>${esc(fmtWhen(j.starts_at))}</dd><dt>משאבה מוזמנת</dt><dd>${esc(pumpText(j))}</dd><dt>כמות</dt><dd>${esc(j.qty)} קוב</dd></dl>
+        <div class="btns"><button class="btn small ghost" data-act="edit-job">עריכה</button>${j.taken_by?'<button class="btn small" data-act="release">שחרר עבודה</button>':''}</div>
+      </div>
+      ${j.taken_by?`<div class="banner ok">העבודה ננעלה. ${esc(conName(j.taken_by))} לקח אותה.</div>`:''}
+      <div class="label">קבלנים מתאימים (${m.length})</div>
+      ${m.length?m.map(({c,exact,hit})=>`
+        <div class="card">
+          <div class="row"><strong>${esc(c.name)}</strong><span class="meta" dir="ltr">${esc(c.phone)}</span></div>
+          <div class="chips">${(c.mobiles||[]).map(s=>`<span class="chip ${s===hit?'hit':''}">ניידת ${sizeLabel(s)}</span>`).join('')}${c.mayko?`<span class="chip ${j.pump_type==='mayko'?'hit':''}">מייקו ${c.mayko} מ'</span>`:''}</div>
+          ${exact?'':'<div class="note">אין לו בדיוק את הגודל המבוקש, יש גדול יותר.</div>'}
+          <div class="btns">
+            <a class="btn wa small" href="${esc(waLink(j,c))}" target="_blank" rel="noopener">שלח ב‑WhatsApp</a>
+            <button class="btn small" data-act="copy" data-link="${esc(offerLink(j,c))}">העתק קישור</button>
+          </div>
+        </div>`).join(''):'<div class="empty">אין קבלן ברשימה עם המשאבה הזאת.</div>'}
+    </div>`;
+  }
+  function renderCons(){
+    app.innerHTML=`<div class="stack">
+      <div class="row"><h2>קבלנים</h2><button class="btn primary small" data-act="new-con">+ קבלן חדש</button></div>
+      ${!state.loaded?'<div class="empty">טוען…</div>':state.contractors.length?state.contractors.map(c=>`
+        <button class="card" data-act="edit-con" data-id="${c.id}">
+          <div class="row"><strong>${esc(c.name)}</strong><span class="meta" dir="ltr">${esc(c.phone)}</span></div>
+          <div class="chips">${(c.mobiles||[]).map(s=>`<span class="chip">ניידת ${sizeLabel(s)}</span>`).join('')}${c.mayko?`<span class="chip">מייקו ${c.mayko} מ'</span>`:''}${!(c.mobiles||[]).length&&!c.mayko?'<span class="note">לא הוגדרו משאבות</span>':''}</div>
+        </button>`).join(''):'<div class="empty">אין עדיין קבלנים. לחץ "+ קבלן חדש" כדי להוסיף.</div>'}
+    </div>`;
+  }
+
+  function jobSheet(j){
+    const isNew=!j; j=j||{site:'',starts_at:'',qty:'',pump_type:'mobile',pump_size:42};
+    let type=j.pump_type;
+    const sizeField=()=>type==='mayko'
+      ?`<label for="f-size">אורך צנרת מוזמן (מטר)</label><input id="f-size" type="number" inputmode="numeric" min="1" value="${j.pump_type==='mayko'?esc(j.pump_size):''}" placeholder="למשל 100">`
+      :`<label for="f-size">גודל משאבה מוזמן</label><select id="f-size">${MOBILE_SIZES.map(s=>`<option value="${s}" ${j.pump_type==='mobile'&&j.pump_size===s?'selected':''}>${sizeLabel(s)}</option>`).join('')}</select>`;
+    sheetRoot.innerHTML=`<div class="sheet-bg" data-act="sheet-bg"><form class="sheet" id="job-form" novalidate>
+      <h2>${isNew?'עבודה חדשה':'עריכת עבודה'}</h2>
+      <div class="field"><label for="f-site">שם האתר</label><input id="f-site" value="${esc(j.site)}"></div>
+      <div class="field"><label for="f-dt">תאריך ושעת יציקה</label><input id="f-dt" type="datetime-local" value="${esc(toLocalInput(j.starts_at))}"></div>
+      <div class="field"><span class="lbl">סוג משאבה</span><div class="seg"><button type="button" id="t-mobile" aria-pressed="${type==='mobile'}">ניידת</button><button type="button" id="t-mayko" aria-pressed="${type==='mayko'}">מייקו</button></div></div>
+      <div class="field" id="size-box">${sizeField()}</div>
+      <div class="field"><label for="f-qty">כמות מוזמנת (קוב)</label><input id="f-qty" type="number" inputmode="decimal" min="0" value="${esc(j.qty)}"></div>
+      <div class="err" id="f-err" hidden></div>
+      <div class="btns"><button class="btn primary" type="submit" id="f-save">שמור</button><button class="btn ghost" type="button" data-act="close-sheet">ביטול</button>${isNew?'':'<button class="btn danger" type="button" id="del-job">מחק</button>'}</div>
+    </form></div>`;
+    const setType=t=>{type=t;document.getElementById('t-mobile').setAttribute('aria-pressed',t==='mobile');document.getElementById('t-mayko').setAttribute('aria-pressed',t==='mayko');document.getElementById('size-box').innerHTML=sizeField();};
+    document.getElementById('t-mobile').onclick=()=>setType('mobile');
+    document.getElementById('t-mayko').onclick=()=>setType('mayko');
+    const del=document.getElementById('del-job');
+    if(del) del.onclick=async()=>{
+      if(!del.dataset.sure){del.dataset.sure=1;del.textContent='לחץ שוב למחיקה';return;}
+      const {error}=await sb.from('jobs').delete().eq('id',j.id);
+      if(error) return toast('המחיקה נכשלה: '+error.message);
+      closeSheet();state.view='list';await load();toast('העבודה נמחקה');
+    };
+    document.getElementById('job-form').onsubmit=async e=>{
+      e.preventDefault();
+      const v=id=>document.getElementById(id).value.trim();
+      const err=document.getElementById('f-err');
+      const row={site:v('f-site'),starts_at:v('f-dt')?new Date(v('f-dt')).toISOString():'',qty:Number(v('f-qty')),pump_type:type,pump_size:Number(v('f-size'))};
+      const miss=!row.site?'שם האתר':!row.starts_at?'תאריך ושעה':!row.pump_size?'גודל משאבה':!row.qty?'כמות':'';
+      if(miss){err.textContent=`חסר: ${miss}`;err.hidden=false;return;}
+      document.getElementById('f-save').disabled=true;
+      const res=isNew?await sb.from('jobs').insert(row).select().single():await sb.from('jobs').update(row).eq('id',j.id).select().single();
+      if(res.error){err.textContent='השמירה נכשלה: '+res.error.message;err.hidden=false;document.getElementById('f-save').disabled=false;return;}
+      closeSheet(); state.view='job'; state.jobId=res.data.id; await load(); toast('העבודה נשמרה');
+    };
+  }
+  function conSheet(c){
+    const isNew=!c; c=c||{name:'',phone:'',mobiles:[],mayko:null};
+    sheetRoot.innerHTML=`<div class="sheet-bg" data-act="sheet-bg"><form class="sheet" id="con-form" novalidate>
+      <h2>${isNew?'קבלן חדש':'עריכת קבלן'}</h2>
+      <div class="field"><label for="c-name">שם</label><input id="c-name" value="${esc(c.name)}"></div>
+      <div class="field"><label for="c-phone">טלפון</label><input id="c-phone" type="tel" dir="ltr" value="${esc(c.phone)}" placeholder="050-1234567"></div>
+      <div class="field"><span class="lbl">ניידות זמינות</span><div class="checks">${MOBILE_SIZES.map(s=>`<label><input type="checkbox" id="m-${s}" ${(c.mobiles||[]).includes(s)?'checked':''}>${sizeLabel(s)}</label>`).join('')}</div></div>
+      <div class="field"><label for="c-mayko">מייקו – אורך צנרת מקסימלי (מטר)</label><input id="c-mayko" type="number" inputmode="numeric" min="0" value="${esc(c.mayko??'')}" placeholder="ריק = אין מייקו"></div>
+      <div class="err" id="c-err" hidden></div>
+      <div class="btns"><button class="btn primary" type="submit" id="c-save">שמור</button><button class="btn ghost" type="button" data-act="close-sheet">ביטול</button>${isNew?'':'<button class="btn danger" type="button" id="del-con">מחק</button>'}</div>
+    </form></div>`;
+    const del=document.getElementById('del-con');
+    if(del) del.onclick=async()=>{
+      if(!del.dataset.sure){del.dataset.sure=1;del.textContent='לחץ שוב למחיקה';return;}
+      const {error}=await sb.from('contractors').delete().eq('id',c.id);
+      if(error) return toast('המחיקה נכשלה: '+error.message);
+      closeSheet();await load();toast('הקבלן נמחק');
+    };
+    document.getElementById('con-form').onsubmit=async e=>{
+      e.preventDefault();
+      const err=document.getElementById('c-err');
+      const row={name:document.getElementById('c-name').value.trim(),phone:document.getElementById('c-phone').value.trim(),
+        mobiles:MOBILE_SIZES.filter(s=>document.getElementById('m-'+s).checked),
+        mayko:Number(document.getElementById('c-mayko').value)||null};
+      if(!row.name||!row.phone){err.textContent='צריך שם וטלפון';err.hidden=false;return;}
+      document.getElementById('c-save').disabled=true;
+      const res=isNew?await sb.from('contractors').insert(row):await sb.from('contractors').update(row).eq('id',c.id);
+      if(res.error){err.textContent='השמירה נכשלה: '+res.error.message;err.hidden=false;document.getElementById('c-save').disabled=false;return;}
+      closeSheet();await load();toast('הקבלן נשמר');
+    };
+  }
+
+  function loginPage(){
+    hdr.hidden=true;
+    app.innerHTML=`<form class="stack" id="login" style="padding-top:40px" novalidate>
+      <h1>סידור קבלני שאיבה</h1>
+      <div class="field"><label for="l-email">מייל</label><input id="l-email" type="email" dir="ltr" autocomplete="username"></div>
+      <div class="field"><label for="l-pass">סיסמה</label><input id="l-pass" type="password" dir="ltr" autocomplete="current-password"></div>
+      <div class="err" id="l-err" hidden></div>
+      <button class="btn primary" type="submit" id="l-btn">כניסה</button>
+    </form>`;
+    document.getElementById('login').onsubmit=async e=>{
+      e.preventDefault();
+      const b=document.getElementById('l-btn'), err=document.getElementById('l-err');
+      b.disabled=true;
+      const {error}=await sb.auth.signInWithPassword({email:document.getElementById('l-email').value.trim(),password:document.getElementById('l-pass').value});
+      if(error){err.textContent='המייל או הסיסמה לא נכונים';err.hidden=false;b.disabled=false;return;}
+      start();
+    };
+  }
+  let started=false;
+  function start(){
+    hdr.hidden=false; render(); load();
+    if(started) return; started=true;
+    try{ sb.channel('jobs-live').on('postgres_changes',{event:'*',schema:'public',table:'jobs'},()=>load()).subscribe(); }catch(e){}
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) load(); });
+  }
+
+  document.getElementById('tab-jobs').onclick=()=>{state.tab='jobs';render();};
+  document.getElementById('tab-cons').onclick=()=>{state.tab='cons';render();};
+  document.getElementById('logout').onclick=async()=>{await sb.auth.signOut();location.reload();};
+  document.addEventListener('click',async e=>{
+    const el=e.target.closest('[data-act]'); if(!el) return;
+    const a=el.dataset.act, id=el.dataset.id;
+    if(a==='sheet-bg'){ if(e.target===el) closeSheet(); return; }
+    if(a==='close-sheet') return closeSheet();
+    if(a==='new-job') return jobSheet(null);
+    if(a==='edit-job') return jobSheet(state.jobs.find(x=>x.id===state.jobId));
+    if(a==='new-con') return conSheet(null);
+    if(a==='edit-con') return conSheet(state.contractors.find(x=>x.id===id));
+    if(a==='open-job'){state.view='job';state.jobId=id;render();window.scrollTo(0,0);return;}
+    if(a==='back'){state.view='list';render();return;}
+    if(a==='copy'){try{await navigator.clipboard.writeText(el.dataset.link);toast('הקישור הועתק');}catch(err){prompt('העתק את הקישור:',el.dataset.link);}return;}
+    if(a==='release'){
+      if(!el.dataset.sure){el.dataset.sure=1;el.textContent='לחץ שוב לשחרור';return;}
+      const {error}=await sb.from('jobs').update({taken_by:null,taken_at:null}).eq('id',state.jobId);
+      if(error) return toast('לא הצלחתי לשחרר: '+error.message);
+      await load();toast('העבודה פתוחה שוב');
+    }
+  });
+
+  sb.auth.getSession().then(({data})=>{ data.session?start():loginPage(); });
+}
+</script>
+</body>
+</html>
