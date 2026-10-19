@@ -56,7 +56,7 @@ button.card{font:inherit;color:inherit;text-align:right;cursor:pointer;width:100
 .btn:focus-visible,.tab:focus-visible,button.card:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .btns{display:flex;gap:8px;flex-wrap:wrap}
 .btns .btn{flex:1 1 auto}
-.back{background:none;border:0;font:inherit;color:var(--muted);padding:6px 0;cursor:pointer;text-align:right}
+.back{align-self:flex-start;font:inherit;font-weight:700;font-size:16px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-height:44px;cursor:pointer}
 .empty{border:1.5px dashed var(--line);border-radius:var(--r);padding:22px;text-align:center;color:var(--muted)}
 .detail dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
 .detail dt{color:var(--muted);font-size:14px}
@@ -274,7 +274,7 @@ function adminApp(){
       if(!del.dataset.sure){del.dataset.sure=1;del.textContent='לחץ שוב למחיקה';return;}
       const {error}=await sb.from('jobs').delete().eq('id',j.id);
       if(error) return toast('המחיקה נכשלה: '+error.message);
-      closeSheet();state.view='list';await load();toast('העבודה נמחקה');
+      closeSheet();goList();await load();toast('העבודה נמחקה');
     };
     document.getElementById('job-form').onsubmit=async e=>{
       e.preventDefault();
@@ -286,7 +286,7 @@ function adminApp(){
       document.getElementById('f-save').disabled=true;
       const res=isNew?await sb.from('jobs').insert(row).select().single():await sb.from('jobs').update(row).eq('id',j.id).select().single();
       if(res.error){err.textContent='השמירה נכשלה: '+res.error.message;err.hidden=false;document.getElementById('f-save').disabled=false;return;}
-      closeSheet(); state.view='job'; state.jobId=res.data.id; await load(); toast('העבודה נשמרה');
+      closeSheet(); if(isNew) openJob(res.data.id); await load(); toast('העבודה נשמרה');
     };
   }
   function conSheet(c){
@@ -347,7 +347,10 @@ function adminApp(){
     document.addEventListener('visibilitychange',()=>{ if(!document.hidden) load(); });
   }
 
-  document.getElementById('tab-jobs').onclick=()=>{state.tab='jobs';render();};
+  document.getElementById('tab-jobs').onclick=()=>{state.tab='jobs';goList();};
+  function openJob(id){state.tab='jobs';state.view='job';state.jobId=id;try{history.pushState({job:id},'');}catch(e){}render();window.scrollTo(0,0);}
+  function goList(){state.view='list';state.jobId=null;if(history.state&&history.state.job){history.back();return;}render();}
+  window.addEventListener('popstate',()=>{closeSheet();const id=history.state&&history.state.job;if(id){state.view='job';state.jobId=id;}else{state.view='list';state.jobId=null;}render();window.scrollTo(0,0);});
   document.getElementById('tab-cons').onclick=()=>{state.tab='cons';render();};
   document.getElementById('logout').onclick=async()=>{await sb.auth.signOut();location.reload();};
   document.addEventListener('click',async e=>{
@@ -359,8 +362,8 @@ function adminApp(){
     if(a==='edit-job') return jobSheet(state.jobs.find(x=>x.id===state.jobId));
     if(a==='new-con') return conSheet(null);
     if(a==='edit-con') return conSheet(state.contractors.find(x=>x.id===id));
-    if(a==='open-job'){state.view='job';state.jobId=id;render();window.scrollTo(0,0);return;}
-    if(a==='back'){state.view='list';render();return;}
+    if(a==='open-job') return openJob(id);
+    if(a==='back') return goList();
     if(a==='copy'){try{await navigator.clipboard.writeText(el.dataset.link);toast('הקישור הועתק');}catch(err){prompt('העתק את הקישור:',el.dataset.link);}return;}
     if(a==='release'){
       if(!el.dataset.sure){el.dataset.sure=1;el.textContent='לחץ שוב לשחרור';return;}
